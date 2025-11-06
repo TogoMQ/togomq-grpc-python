@@ -12,14 +12,20 @@ Runs on every push and pull request to `main`:
 - Lints code with flake8
 
 ### 2. Auto Release & Publish (`release.yml`)
-Automatically creates version tags, GitHub releases, and publishes to PyPI:
-- **On main push**: Auto-detects version bump from commit messages
-- **Manual trigger**: Choose patch/minor/major version bump
+A two-phase workflow that automates the entire release process:
+
+**Phase 1 - On main push (create release):**
+- Auto-detects version bump from commit messages
 - Updates version in `setup.py`, `pyproject.toml`, and `__init__.py`
-- Creates Git tag (e.g., `v0.1.0`)
+- Creates and pushes Git tag (e.g., `v0.1.0`)
 - Creates GitHub Release with changelog
-- Builds and publishes package to PyPI
-- Uses GitHub's Trusted Publishers (OIDC) - no API tokens needed!
+
+**Phase 2 - On tag push (publish to PyPI):**
+- Builds Python package
+- Publishes to PyPI using Trusted Publishers (OIDC)
+- No API tokens needed!
+
+**Manual trigger**: Choose patch/minor/major version bump
 
 **Commit Message Conventions:**
 - `major:` or `breaking:` → Major version bump (1.0.0 → 2.0.0)

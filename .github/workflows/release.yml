@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - 'v*'
   workflow_dispatch:
     inputs:
       version_bump:
@@ -19,6 +21,7 @@ on:
 jobs:
   create-release:
     name: Create Release Tag
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     outputs:
       tag_created: ${{ steps.set_output.outputs.tag_created }}
@@ -231,13 +234,10 @@ jobs:
   
   build:
     name: Build distribution
-    needs: create-release
-    if: needs.create-release.outputs.tag_created == 'true'
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-      with:
-        ref: v${{ needs.create-release.outputs.new_version }}
     
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -263,10 +263,8 @@ jobs:
 
   publish-to-pypi:
     name: Publish to PyPI
-    needs:
-    - create-release
-    - build
-    if: needs.create-release.outputs.tag_created == 'true'
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     environment:
       name: pypi
