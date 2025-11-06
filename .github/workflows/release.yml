@@ -22,6 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       tag_created: ${{ steps.set_output.outputs.tag_created }}
+      new_version: ${{ steps.new_version.outputs.new_version }}
     permissions:
       contents: write
 
@@ -236,4 +237,6 @@ jobs:
       id-token: write
       contents: read
     uses: ./.github/workflows/publish.yml
+    with:
+      tag: v${{ needs.create-release.outputs.new_version }}
     secrets: inherit
