@@ -12,20 +12,14 @@ Runs on every push and pull request to `main`:
 - Lints code with flake8
 
 ### 2. Auto Release & Publish (`release.yml`)
-A two-phase workflow that automates the entire release process:
-
-**Phase 1 - On main push (create release):**
-- Auto-detects version bump from commit messages
+Automatically creates version tags, GitHub releases, and publishes to PyPI in a single workflow:
+- **On main push**: Auto-detects version bump from commit messages
+- **Manual trigger**: Choose patch/minor/major version bump
 - Updates version in `setup.py`, `pyproject.toml`, and `__init__.py`
-- Creates and pushes Git tag (e.g., `v0.1.0`)
+- Creates Git tag (e.g., `v0.1.0`)
 - Creates GitHub Release with changelog
-
-**Phase 2 - On tag push (publish to PyPI):**
-- Builds Python package
-- Publishes to PyPI using Trusted Publishers (OIDC)
-- No API tokens needed!
-
-**Manual trigger**: Choose patch/minor/major version bump
+- Builds and publishes package to PyPI
+- Uses GitHub's Trusted Publishers (OIDC) - no API tokens needed!
 
 **Commit Message Conventions:**
 - `major:` or `breaking:` → Major version bump (1.0.0 → 2.0.0)
@@ -49,10 +43,24 @@ A two-phase workflow that automates the entire release process:
 
 ### GitHub Repository Settings
 
-#### Create Environment
+#### 1. Create Environment
 1. Go to repository Settings → Environments
 2. Create environment:
    - **pypi**: For production releases (add protection rules if desired)
+
+#### 2. Configure PyPI Trusted Publisher
+
+PyPI needs to be configured to accept publishes from the `main` branch:
+
+1. Go to https://pypi.org/manage/project/togomq-grpc/settings/publishing/
+2. Add a new publisher:
+   - **PyPI Project Name**: `togomq-grpc`
+   - **Owner**: `TogoMQ`
+   - **Repository name**: `togomq-grpc-python`
+   - **Workflow name**: `release.yml`
+   - **Environment name**: `pypi`
+
+**Note**: Leave the "Ref" field empty to allow publishes from any branch/tag.
 
 ## Publishing a Release
 
