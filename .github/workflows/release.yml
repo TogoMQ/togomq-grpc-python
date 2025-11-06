@@ -221,5 +221,8 @@ jobs:
     name: Trigger PyPI Publish
     needs: create-release
     if: needs.create-release.outputs.tag_created == 'true'
+    permissions:
+      id-token: write
+      contents: read
     uses: ./.github/workflows/publish.yml
     secrets: inherit
