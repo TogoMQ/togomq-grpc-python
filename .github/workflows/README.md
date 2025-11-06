@@ -6,7 +6,7 @@ This directory contains GitHub Actions workflows for the TogoMQ Python gRPC pack
 
 ### 1. CI (`ci.yml`)
 Runs on every push and pull request to `main`:
-- Tests imports on Python 3.8, 3.9, 3.10, 3.11, and 3.12
+- Tests imports on Python 3.9, 3.10, 3.11, and 3.12
 - Compiles all Python files
 - Builds the package
 - Lints code with flake8

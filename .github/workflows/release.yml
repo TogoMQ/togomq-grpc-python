@@ -42,16 +42,16 @@ jobs:
     - name: Get current version from setup.py
       id: get_version
       run: |
-        CURRENT_VERSION=$(python -c "
+        CURRENT_VERSION=$(python -c '
         import re
-        with open('setup.py', 'r') as f:
+        with open("setup.py", "r") as f:
             content = f.read()
-            match = re.search(r'version=[\"'\'']([^\"'\'']+)[\"'\'']', content)
+            match = re.search(r"version=\"([^\"]+)\"", content)
             if match:
                 print(match.group(1))
             else:
-                print('0.0.0')
-        ")
+                print("0.0.0")
+        ')
         echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
         echo "Current version: $CURRENT_VERSION"
     
@@ -80,29 +80,29 @@ jobs:
         CURRENT="${{ steps.get_version.outputs.current_version }}"
         BUMP_TYPE="${{ steps.bump_type.outputs.bump_type }}"
         
-        NEW_VERSION=$(python -c "
+        NEW_VERSION=$(python -c '
         from packaging import version as pkg_version
         
-        current = '$CURRENT'
-        bump = '$BUMP_TYPE'
+        current = "'"$CURRENT"'"
+        bump = "'"$BUMP_TYPE"'"
         
-        parts = current.split('.')
+        parts = current.split(".")
         major = int(parts[0])
         minor = int(parts[1]) if len(parts) > 1 else 0
         patch = int(parts[2]) if len(parts) > 2 else 0
         
-        if bump == 'major':
+        if bump == "major":
             major += 1
             minor = 0
             patch = 0
-        elif bump == 'minor':
+        elif bump == "minor":
             minor += 1
             patch = 0
         else:  # patch
             patch += 1
         
-        print(f'{major}.{minor}.{patch}')
-        ")
+        print(f"{major}.{minor}.{patch}")
+        ')
         
         echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
         echo "New version: $NEW_VERSION"
@@ -125,46 +125,46 @@ jobs:
         NEW_VERSION="${{ steps.new_version.outputs.new_version }}"
         
         # Update setup.py
-        python -c "
+        python -c '
         import re
-        with open('setup.py', 'r') as f:
+        with open("setup.py", "r") as f:
             content = f.read()
         content = re.sub(
-            r'version=[\"'\'']([^\"'\'']+)[\"'\'']',
-            f'version=\"$NEW_VERSION\"',
+            r"version=\"([^\"]+)\"",
+            f"version=\"'"$NEW_VERSION"'\"",
             content
         )
-        with open('setup.py', 'w') as f:
+        with open("setup.py", "w") as f:
             f.write(content)
-        "
+        '
         
         # Update pyproject.toml
-        python -c "
+        python -c '
         import re
-        with open('pyproject.toml', 'r') as f:
+        with open("pyproject.toml", "r") as f:
             content = f.read()
         content = re.sub(
-            r'version = [\"'\'']([^\"'\'']+)[\"'\'']',
-            f'version = \"$NEW_VERSION\"',
+            r"version = \"([^\"]+)\"",
+            f"version = \"'"$NEW_VERSION"'\"",
             content
         )
-        with open('pyproject.toml', 'w') as f:
+        with open("pyproject.toml", "w") as f:
             f.write(content)
-        "
+        '
         
         # Update __init__.py
-        python -c "
+        python -c '
         import re
-        with open('__init__.py', 'r') as f:
+        with open("__init__.py", "r") as f:
             content = f.read()
         content = re.sub(
-            r'__version__ = [\"'\'']([^\"'\'']+)[\"'\'']',
-            f'__version__ = \"$NEW_VERSION\"',
+            r"__version__ = \"([^\"]+)\"",
+            f"__version__ = \"'"$NEW_VERSION"'\"",
             content
         )
-        with open('__init__.py', 'w') as f:
+        with open("__init__.py", "w") as f:
             f.write(content)
-        "
+        '
         
         echo "Updated version to $NEW_VERSION in all files"
     
