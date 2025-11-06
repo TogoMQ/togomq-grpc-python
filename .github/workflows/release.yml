@@ -21,7 +21,7 @@ jobs:
     name: Create Release Tag
     runs-on: ubuntu-latest
     outputs:
-      tag_created: ${{ steps.create_tag.outputs.created }}
+      tag_created: ${{ steps.set_output.outputs.tag_created }}
     permissions:
       contents: write
 
@@ -192,16 +192,22 @@ jobs:
         git tag -a "$TAG_NAME" -m "Release $TAG_NAME"
         git push origin "$TAG_NAME"
         echo "Created and pushed tag: $TAG_NAME"
-        echo "created=true" >> $GITHUB_OUTPUT
+    
+    - name: Set tag created output
+      id: set_output
+      run: |
+        if [ "${{ steps.check_tag.outputs.exists }}" == "false" ]; then
+          echo "tag_created=true" >> $GITHUB_OUTPUT
+        else
+          echo "tag_created=false" >> $GITHUB_OUTPUT
+        fi
     
     - name: Create GitHub Release
       if: steps.check_tag.outputs.exists == 'false'
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v2
       with:
         tag_name: v${{ steps.new_version.outputs.new_version }}
-        release_name: Release v${{ steps.new_version.outputs.new_version }}
+        name: Release v${{ steps.new_version.outputs.new_version }}
         body: |
           Auto-generated release v${{ steps.new_version.outputs.new_version }}
           
