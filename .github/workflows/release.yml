@@ -20,6 +20,8 @@ jobs:
   create-release:
     name: Create Release Tag
     runs-on: ubuntu-latest
+    outputs:
+      tag_created: ${{ steps.create_tag.outputs.created }}
     permissions:
       contents: write
 
@@ -177,6 +179,7 @@ jobs:
         git commit -m "chore: bump version to ${{ steps.new_version.outputs.new_version }}" || echo "No changes to commit"
     
     - name: Create and push tag
+      id: create_tag
       if: steps.check_tag.outputs.exists == 'false'
       run: |
         TAG_NAME="v${{ steps.new_version.outputs.new_version }}"
@@ -184,6 +187,7 @@ jobs:
         git push origin main
         git push origin "$TAG_NAME"
         echo "Created and pushed tag: $TAG_NAME"
+        echo "created=true" >> $GITHUB_OUTPUT
     
     - name: Create GitHub Release
       if: steps.check_tag.outputs.exists == 'false'
@@ -212,3 +216,10 @@ jobs:
       if: steps.check_tag.outputs.exists == 'true'
       run: |
         echo "Tag v${{ steps.new_version.outputs.new_version }} already exists. Skipping release."
+  
+  publish:
+    name: Trigger PyPI Publish
+    needs: create-release
+    if: needs.create-release.outputs.tag_created == 'true'
+    uses: ./.github/workflows/publish.yml
+    secrets: inherit

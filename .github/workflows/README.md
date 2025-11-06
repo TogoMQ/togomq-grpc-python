@@ -26,7 +26,9 @@ Automatically creates version tags and GitHub releases:
 
 ### 3. Publish (`publish.yml`)
 Handles PyPI publishing:
-- **On tag push (v*)**: Publishes to PyPI (production)
+- **Triggered by release workflow**: Automatically publishes after tag creation
+- **On tag push (v*)**: Can also be triggered by manual tag pushes
+- **Manual trigger**: Can be run manually from GitHub Actions UI
 - Uses GitHub's Trusted Publishers (OIDC) - no API tokens needed!
 
 ## Setting Up PyPI Publishing
@@ -55,7 +57,7 @@ Handles PyPI publishing:
 
 ### Automatic Release (Recommended)
 
-The release workflow automatically handles versioning and tagging.
+The release workflow automatically handles versioning, tagging, and publishing.
 
 #### Option 1: Auto-detect from commit message
 Push to main with a semantic commit message:
@@ -64,12 +66,13 @@ git commit -m "feat: add new message type support"
 git push origin main
 ```
 
-This will:
+This will automatically:
 1. Detect the version bump type from commit message
 2. Update version numbers in all files
 3. Create a Git tag (e.g., `v0.2.0`)
 4. Create a GitHub Release
-5. Trigger PyPI publication
+5. **Automatically trigger PyPI publication**
+6. Package available via `pip install togomq-grpc`
 
 #### Option 2: Manual trigger
 1. Go to Actions → Auto Release
