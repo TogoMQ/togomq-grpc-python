@@ -11,25 +11,20 @@ Runs on every push and pull request to `main`:
 - Builds the package
 - Lints code with flake8
 
-### 2. Auto Release (`release.yml`)
-Automatically creates version tags and GitHub releases:
+### 2. Auto Release & Publish (`release.yml`)
+Automatically creates version tags, GitHub releases, and publishes to PyPI:
 - **On main push**: Auto-detects version bump from commit messages
 - **Manual trigger**: Choose patch/minor/major version bump
 - Updates version in `setup.py`, `pyproject.toml`, and `__init__.py`
 - Creates Git tag (e.g., `v0.1.0`)
 - Creates GitHub Release with changelog
+- Builds and publishes package to PyPI
+- Uses GitHub's Trusted Publishers (OIDC) - no API tokens needed!
 
 **Commit Message Conventions:**
 - `major:` or `breaking:` → Major version bump (1.0.0 → 2.0.0)
 - `feat:` or `feature:` or `minor:` → Minor version bump (0.1.0 → 0.2.0)
 - Any other commit → Patch version bump (0.1.0 → 0.1.1)
-
-### 3. Publish (`publish.yml`)
-Handles PyPI publishing:
-- **Triggered by release workflow**: Automatically publishes after tag creation
-- **On tag push (v*)**: Can also be triggered by manual tag pushes
-- **Manual trigger**: Can be run manually from GitHub Actions UI
-- Uses GitHub's Trusted Publishers (OIDC) - no API tokens needed!
 
 ## Setting Up PyPI Publishing
 
@@ -43,7 +38,7 @@ Handles PyPI publishing:
    - **PyPI Project Name**: `togomq-grpc`
    - **Owner**: `TogoMQ`
    - **Repository name**: `togomq-grpc-python`
-   - **Workflow name**: `publish.yml`
+   - **Workflow name**: `release.yml`
    - **Environment name**: `pypi`
 
 ### GitHub Repository Settings

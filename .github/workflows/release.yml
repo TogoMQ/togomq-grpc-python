@@ -229,25 +229,57 @@ jobs:
       run: |
         echo "Tag v${{ steps.new_version.outputs.new_version }} already exists. Skipping release."
   
-  publish:
-    name: Trigger PyPI Publish
+  build:
+    name: Build distribution
     needs: create-release
     if: needs.create-release.outputs.tag_created == 'true'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: v${{ needs.create-release.outputs.new_version }}
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+    
+    - name: Install build dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build twine
+    
+    - name: Build package
+      run: python -m build
+    
+    - name: Check package
+      run: twine check dist/*
+    
+    - name: Store the distribution packages
+      uses: actions/upload-artifact@v4
+      with:
+        name: python-package-distributions
+        path: dist/
+
+  publish-to-pypi:
+    name: Publish to PyPI
+    needs:
+    - create-release
+    - build
+    if: needs.create-release.outputs.tag_created == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/togomq-grpc
     permissions:
       id-token: write
       contents: read
-    uses: ./.github/workflows/publish.yml
-    with:
-      tag: v${{ needs.create-release.outputs.new_version }}
-    secrets: inherit
-  
-  debug:
-    name: Debug Outputs
-    needs: create-release
-    runs-on: ubuntu-latest
     steps:
-      - name: Show outputs
-        run: |
-          echo "tag_created: ${{ needs.create-release.outputs.tag_created }}"
-          echo "new_version: ${{ needs.create-release.outputs.new_version }}"
-          echo "Should trigger publish: ${{ needs.create-release.outputs.tag_created == 'true' }}"
+    - name: Download distributions
+      uses: actions/download-artifact@v4
+      with:
+        name: python-package-distributions
+        path: dist/
+    
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
