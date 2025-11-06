@@ -240,3 +240,14 @@ jobs:
     with:
       tag: v${{ needs.create-release.outputs.new_version }}
     secrets: inherit
+  
+  debug:
+    name: Debug Outputs
+    needs: create-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show outputs
+        run: |
+          echo "tag_created: ${{ needs.create-release.outputs.tag_created }}"
+          echo "new_version: ${{ needs.create-release.outputs.new_version }}"
+          echo "Should trigger publish: ${{ needs.create-release.outputs.tag_created == 'true' }}"
