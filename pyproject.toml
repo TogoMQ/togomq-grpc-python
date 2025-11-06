@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "togomq-grpc"
-version = "0.1.9"
+version = "0.1.10"
 authors = [
     {name = "Enter Pages Pro Ltd", email = "dev@enterpages.co.uk"},
 ]
