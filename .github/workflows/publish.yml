@@ -46,7 +46,6 @@ jobs:
 
   publish-to-pypi:
     name: Publish to PyPI
-    if: (startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_call')
     needs:
     - build
     runs-on: ubuntu-latest
