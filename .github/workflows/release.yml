@@ -178,13 +178,18 @@ jobs:
         git add setup.py pyproject.toml __init__.py
         git commit -m "chore: bump version to ${{ steps.new_version.outputs.new_version }}" || echo "No changes to commit"
     
+    - name: Push version bump to main
+      if: steps.check_tag.outputs.exists == 'false'
+      run: |
+        git push origin HEAD:main
+        echo "Pushed version bump to main"
+    
     - name: Create and push tag
       id: create_tag
       if: steps.check_tag.outputs.exists == 'false'
       run: |
         TAG_NAME="v${{ steps.new_version.outputs.new_version }}"
         git tag -a "$TAG_NAME" -m "Release $TAG_NAME"
-        git push origin main
         git push origin "$TAG_NAME"
         echo "Created and pushed tag: $TAG_NAME"
         echo "created=true" >> $GITHUB_OUTPUT
