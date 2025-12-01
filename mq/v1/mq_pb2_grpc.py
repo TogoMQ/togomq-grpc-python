@@ -16,12 +16,12 @@ class MqServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.PubMessage = channel.stream_unary(
+        self.PubMessage = channel.stream_stream(
                 '/mq.v1.MqService/PubMessage',
                 request_serializer=mq_dot_v1_dot_mq__pb2.PubMessageRequest.SerializeToString,
                 response_deserializer=mq_dot_v1_dot_mq__pb2.PubMessageResponse.FromString,
                 _registered_method=True)
-        self.SubMessage = channel.unary_stream(
+        self.SubMessage = channel.stream_stream(
                 '/mq.v1.MqService/SubMessage',
                 request_serializer=mq_dot_v1_dot_mq__pb2.SubMessageRequest.SerializeToString,
                 response_deserializer=mq_dot_v1_dot_mq__pb2.SubMessageResponse.FromString,
@@ -49,7 +49,7 @@ class MqServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def SubMessage(self, request, context):
+    def SubMessage(self, request_iterator, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -70,12 +70,12 @@ class MqServiceServicer(object):
 
 def add_MqServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'PubMessage': grpc.stream_unary_rpc_method_handler(
+            'PubMessage': grpc.stream_stream_rpc_method_handler(
                     servicer.PubMessage,
                     request_deserializer=mq_dot_v1_dot_mq__pb2.PubMessageRequest.FromString,
                     response_serializer=mq_dot_v1_dot_mq__pb2.PubMessageResponse.SerializeToString,
             ),
-            'SubMessage': grpc.unary_stream_rpc_method_handler(
+            'SubMessage': grpc.stream_stream_rpc_method_handler(
                     servicer.SubMessage,
                     request_deserializer=mq_dot_v1_dot_mq__pb2.SubMessageRequest.FromString,
                     response_serializer=mq_dot_v1_dot_mq__pb2.SubMessageResponse.SerializeToString,
@@ -114,7 +114,7 @@ class MqService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.stream_unary(
+        return grpc.experimental.stream_stream(
             request_iterator,
             target,
             '/mq.v1.MqService/PubMessage',
@@ -131,7 +131,7 @@ class MqService(object):
             _registered_method=True)
 
     @staticmethod
-    def SubMessage(request,
+    def SubMessage(request_iterator,
             target,
             options=(),
             channel_credentials=None,
@@ -141,8 +141,8 @@ class MqService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(
-            request,
+        return grpc.experimental.stream_stream(
+            request_iterator,
             target,
             '/mq.v1.MqService/SubMessage',
             mq_dot_v1_dot_mq__pb2.SubMessageRequest.SerializeToString,
