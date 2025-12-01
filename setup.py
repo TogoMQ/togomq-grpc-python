@@ -7,7 +7,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="togomq-grpc",
-    version="0.1.11",
+    version="0.1.12",
     author="Enter Pages Pro Ltd",
     author_email="dev@enterpages.co.uk",
     description="Auto-generated gRPC Python client for TogoMQ",
